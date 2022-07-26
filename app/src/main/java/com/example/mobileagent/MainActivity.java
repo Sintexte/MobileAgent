@@ -11,11 +11,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.ServerError;
+import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
@@ -24,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    String host = "192.168.1.25";
-    int port = 3001;
+    String host = "https://armyforce.azurewebsites.net";
+    int port = 443;
 
     EditText username ;
     EditText password;
@@ -53,8 +55,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String str_user = username.getText().toString();
                 String str_pass = password.getText().toString();
+                info.setText("Vérification ...");
                 if(str_user.length() >= userlen_max && str_pass.length()>=passlen_max){
-                    String url = "http://"+host+":"+port+"/api/login";
+                    String url = host+":"+port+"/api/login";
                     StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                             new Response.Listener<String>() {
                                 @Override
@@ -64,8 +67,8 @@ public class MainActivity extends AppCompatActivity {
                             }, new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-                                    if(error instanceof NetworkError || error instanceof ServerError){
-                                        info.setText("NetworkError || ServerError");
+                                    if(error instanceof NetworkError || error instanceof ServerError || error instanceof TimeoutError){
+                                        info.setText("NetworkError || ServerError || Timeout");
                                     }else{
                                         info.setText("Mauvais  Utulisateur ou Mot de Passe");
                                     }
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     };
 
-
+                    stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,2,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
                     queue.add(stringRequest);
                 }else{
                     info.setText("Nom D'utulisateur longeur supérieur à "+userlen_max+"\nMot de passe longeur supérieur à "+passlen_max);
