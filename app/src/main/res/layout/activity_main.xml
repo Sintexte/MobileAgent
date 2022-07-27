@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textview_con"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="52dp"
@@ -17,38 +17,57 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/edit_user"
+        android:layout_width="304dp"
+        android:layout_height="55dp"
+        app:errorEnabled="true"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_con"
+        >
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:hint="Nom D'utulisateur"
+            android:inputType="textPersonName"
+            app:layout_constraintTop_toBottomOf="@+id/edit_user" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/edit_pass"
         android:layout_width="304dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="28dp"
+        android:layout_height="55dp"
         android:ems="10"
-        android:hint="Mot de passe"
-        android:inputType="textPassword"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_user"
-        />
+        android:layout_marginTop="20px"
+        app:passwordToggleEnabled="true">
 
-    <EditText
-        android:id="@+id/edit_user"
-        android:layout_width="304dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="44dp"
-        android:ems="10"
-        android:hint="Nom D'utulisateur"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mot de Passe"
+            android:backgroundTint="@color/white"
+            android:inputType="textPassword"
+            app:layout_constraintTop_toBottomOf="@+id/edit_user" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <Button
         android:id="@+id/btn_connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="128dp"
         android:text="se Connecter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -58,12 +77,14 @@
     <TextView
         android:id="@+id/textView2"
         android:layout_width="304dp"
-        android:layout_height="50dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="5px"
+        android:paddingLeft="30px"
         android:textColor="@color/goodblue"
         app:layout_constraintBottom_toTopOf="@+id/btn_connect"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_pass"
-        app:layout_constraintVertical_bias="0.282" />
+        app:layout_constraintVertical_bias="0.12" />
 </androidx.constraintlayout.widget.ConstraintLayout>

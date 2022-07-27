@@ -3,7 +3,19 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_menu_slideshow.xml" value="0.199" />
+        <entry key="app/src/main/res/drawable/side_nav_bar.xml" value="0.199" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_panel.xml" value="0.2353870458135861" />
+        <entry key="app/src/main/res/layout/app_bar_panel.xml" value="0.13994565217391305" />
+        <entry key="app/src/main/res/layout/content_panel.xml" value="0.13722826086956522" />
+        <entry key="app/src/main/res/layout/fragment_gallery.xml" value="0.13994565217391305" />
+        <entry key="app/src/main/res/layout/fragment_home.xml" value="0.13994565217391305" />
+        <entry key="app/src/main/res/layout/fragment_slideshow.xml" value="0.13994565217391305" />
+        <entry key="app/src/main/res/layout/nav_header_panel.xml" value="0.13994565217391305" />
+        <entry key="app/src/main/res/layout/nav_header_panel2.xml" value="0.13722826086956522" />
+        <entry key="app/src/main/res/menu/activity_panel_drawer.xml" value="0.5" />
+        <entry key="app/src/main/res/menu/panel.xml" value="0.20052083333333334" />
       </map>
     </option>
   </component>

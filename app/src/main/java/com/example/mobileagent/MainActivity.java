@@ -3,12 +3,16 @@ package com.example.mobileagent;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -21,48 +25,94 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.textfield.TextInputLayout;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    String host = "https://armyforce.azurewebsites.net";
-    int port = 443;
+    public static final int port = 443;
+    public static final String host = "https://armyforce.azurewebsites.net:"+port+"/api";
+    public static final String SHARED_PREFS = "user";
 
-    EditText username ;
-    EditText password;
-    TextView info;
-    Button connect;
+    private EditText username ;
+    private EditText password;
+    private TextView info;
+    private Button connect;
 
     //add to backend this restrains for agent only [DONE]
-    int userlen_max = 4;
-    int passlen_max = 4;
+    private int userlen_max = 4;
+    private int passlen_max = 4;
+
+    private SharedPreferences sharedpreferences;
+    private String token;
+    private int role;
+
+    boolean connected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        username = (EditText) findViewById(R.id.edit_user);
-        password = (EditText) findViewById(R.id.edit_pass);
+        TextInputLayout username_layout = findViewById(R.id.edit_user);
+        TextInputLayout password_layout = findViewById(R.id.edit_pass);
+
+        username = (EditText) username_layout.getEditText();
+        password = (EditText) password_layout.getEditText();
         info     = (TextView) findViewById(R.id.textView2);
         connect  = (Button) findViewById(R.id.btn_connect);
+        sharedpreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        connected = sharedpreferences.getBoolean("connected", false);
+        token = sharedpreferences.getString("token", null);
 
         RequestQueue queue = Volley.newRequestQueue(this);
         String TAG = "[******] debug";
-        Log.w(TAG, "onCreate: " );
+
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String str_user = username.getText().toString();
                 String str_pass = password.getText().toString();
                 info.setText("Vérification ...");
+
                 if(str_user.length() >= userlen_max && str_pass.length()>=passlen_max){
-                    String url = host+":"+port+"/api/login";
+                    String url = host+"/login";
                     StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
-                                    info.setText("Connected !");
+                                    try {
+                                        JSONObject json = new JSONObject(response);
+                                        JSONObject json_data = json.getJSONObject("data");
+                                        String token = json_data.getString("token");
+                                        String username = json_data.getString("username");
+                                        String email = json_data.getString("email");
+
+                                        if(json_data.getInt("id_role") == 1){
+                                            SharedPreferences.Editor editor = sharedpreferences.edit();
+                                            editor.putBoolean("connected", true);
+                                            editor.putString("token",token);
+                                            editor.putString("username",username);
+                                            editor.putString("email",email);
+                                            editor.commit();
+                                            Log.d(TAG, token);
+                                            Toast.makeText(MainActivity.this, "Connected {token:"+token+"}", Toast.LENGTH_LONG).show();
+                                            info.setText("Connected");
+                                            Intent panel = new Intent(MainActivity.this, PanelActivity.class);
+                                            startActivity(panel);
+                                            finish();
+                                        }else{
+                                            info.setText("");
+                                            Toast.makeText(MainActivity.this, "Privileges: Administrators cannot use the app", Toast.LENGTH_LONG).show();
+                                        }
+                                    } catch (JSONException e) {
+                                        info.setText("Response Error json");
+                                        Log.e(TAG, e.toString());
+                                    }
+
                                 }
                             }, new Response.ErrorListener() {
                                 @Override
@@ -101,5 +151,16 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(connected && token!=null){
+            Toast.makeText(MainActivity.this, "Already Connected with token :"+token, Toast.LENGTH_LONG).show();
+            Intent panel = new Intent(MainActivity.this, PanelActivity.class);
+            startActivity(panel);
+            finish();
+        }
     }
 }
