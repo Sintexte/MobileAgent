@@ -47,10 +47,13 @@ public class MainActivity extends AppCompatActivity {
     //add to backend this restrains for agent only [DONE]
     private int userlen_max = 4;
     private int passlen_max = 4;
+    String str_user = "";
+    String str_pass = "";
 
     private SharedPreferences sharedpreferences;
     private String token;
     private int role;
+    private boolean iserverup;
 
     boolean connected = false;
 
@@ -75,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String str_user = username.getText().toString();
-                String str_pass = password.getText().toString();
+                str_user = username.getText().toString();
+                str_pass = password.getText().toString();
                 info.setText("Vérification ...");
 
                 if(str_user.length() >= userlen_max && str_pass.length()>=passlen_max){
@@ -146,12 +149,15 @@ public class MainActivity extends AppCompatActivity {
                     };
 
                     stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,2,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
                     queue.add(stringRequest);
+
                 }else{
                     info.setText("Nom D'utulisateur longeur supérieur à "+userlen_max+"\nMot de passe longeur supérieur à "+passlen_max);
                 }
             }
         });
+
     }
 
     @Override
@@ -163,5 +169,25 @@ public class MainActivity extends AppCompatActivity {
             startActivity(panel);
             finish();
         }
+        str_user = username.getText().toString();
+        str_pass = password.getText().toString();
+        Log.w("[***] ",host+"/check");
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, host+"/check",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("[+] Server Up", response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                String TAG = "debug";
+                Log.d("[+] ", "Server Up");
+                Log.e(TAG, error.toString() );
+            }
+        });
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(5000,2,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(stringRequest);
     }
 }
