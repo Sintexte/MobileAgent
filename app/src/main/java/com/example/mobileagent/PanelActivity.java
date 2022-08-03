@@ -1,9 +1,15 @@
 package com.example.mobileagent;
 
+import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +21,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -36,6 +44,8 @@ public class PanelActivity extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent locationservice = new Intent(this,Tracking.class);
+
         binding = ActivityPanelBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(binding.appBarPanel.toolbar);
@@ -67,6 +77,27 @@ public class PanelActivity extends AppCompatActivity implements NavigationView.O
         //Shared Prefs
         sharedpreferences = getSharedPreferences(MainActivity.SHARED_PREFS, Context.MODE_PRIVATE);
         navigationView.setNavigationItemSelectedListener(PanelActivity.this);
+
+        if(!isMyServiceRunning(Tracking.class)){
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+                Log.d("[-]PERMISSIONFAILURE", "Location Permission not granted");
+                this.finishAffinity();
+            }else{
+                // Write you code here if permission already given.
+                if(CheckGpsStatus()){
+                    Log.d("[+]PERMISSIONSUCCESS", "Location Permission granted ...");
+                    Log.d("[+]PERMISSIONSUCCESS", "Starting Tracking Service");
+                    Toast.makeText(this, "PERMISSION SUCCESS",Toast.LENGTH_SHORT).show();
+                    startService(locationservice);
+
+                }else{
+                    Intent myIntent = new Intent(Settings.ACTION_IGNORE_BACKGROUND_DATA_RESTRICTIONS_SETTINGS );
+                    Toast.makeText(this, "Veuillez Activer Service de Localisation",Toast.LENGTH_LONG).show();
+                    startActivity(myIntent);
+                }
+            }
+        }
     }
 
     @Override
@@ -104,6 +135,11 @@ public class PanelActivity extends AppCompatActivity implements NavigationView.O
     }
 
     public void Disconnect(){
+        Intent locationservice = new Intent(this, Tracking.class);
+        if(isMyServiceRunning(Tracking.class)){
+            stopService(locationservice);
+        }
+
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putBoolean("connected",false);
         editor.putString("token",null);
@@ -111,8 +147,28 @@ public class PanelActivity extends AppCompatActivity implements NavigationView.O
         editor.putString("email",null);
         editor.commit();
 
+
         Intent login = new Intent(PanelActivity.this, MainActivity.class);
         startActivity(login);
         finish();
     }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean CheckGpsStatus(){
+        LocationManager locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        assert locationManager != null;
+        boolean GpsStatus = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        return GpsStatus;
+    }
+
+
 }

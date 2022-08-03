@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int port = 443;
     public static final String host = "https://armyforce.azurewebsites.net:"+port+"/api";
     public static final String SHARED_PREFS = "user";
+    public static final int TRACKINGINTERVALMS = 20000;
 
     private EditText username ;
     private EditText password;
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                                             editor.putString("email",email);
                                             editor.commit();
                                             Log.d(TAG, token);
-                                            Toast.makeText(MainActivity.this, "Connected {token:"+token+"}", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(MainActivity.this, "Connected {token:"+token+"}", Toast.LENGTH_SHORT).show();
                                             info.setText("Connected");
                                             Intent panel = new Intent(MainActivity.this, PanelActivity.class);
                                             startActivity(panel);

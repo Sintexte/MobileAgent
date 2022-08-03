@@ -4,6 +4,12 @@
     package="com.example.mobileagent">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- GPS -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
 
     <application
         android:allowBackup="true"
@@ -15,12 +21,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MobileAgent"
         tools:targetApi="31">
+        <service
+            android:name=".Tracking"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="location"></service>
+
         <activity
             android:name=".PanelActivity"
             android:exported="false"
             android:label="@string/title_activity_panel"
-            android:theme="@style/Theme.MobileAgent.NoActionBar"
-            android:noHistory="true"/>
+            android:noHistory="true"
+            android:theme="@style/Theme.MobileAgent.NoActionBar" />
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation"
